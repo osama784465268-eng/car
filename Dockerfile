@@ -1,8 +1,10 @@
-# Dockerfile for Railway Deployment (PHP + Apache + MySQL PDO)
+# Dockerfile for Railway Deployment (PHP + Apache + SQLite & MySQL)
 FROM php:8.2-apache
 
-# Install PDO MySQL extension required for database operations
-RUN docker-php-ext-install pdo pdo_mysql
+# Install PDO MySQL and PDO SQLite extensions required for embedded SQLite database
+RUN apt-get update && apt-get install -y libsqlite3-dev \
+    && docker-php-ext-install pdo pdo_mysql pdo_sqlite \
+    && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -10,8 +12,9 @@ RUN a2enmod rewrite
 # Copy project files into Apache web directory
 COPY . /var/www/html/
 
-# Set correct permissions
-RUN chown -R www-data:www-data /var/www/html
+# Set correct permissions so Apache www-data can write to SQLite database and db directory
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 777 /var/www/html/db
 
 # Dynamic PORT configuration for Railway
 ENV PORT=80
