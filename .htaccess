@@ -1,0 +1,51 @@
+# ============================================================
+# XAMPP Apache Configuration for newcar project
+# ============================================================
+
+Options -Indexes
+DirectoryIndex index.php
+
+# ─── Encoding ───────────────────────────────────────────────
+AddDefaultCharset UTF-8
+
+# ─── CORS Headers ───────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# ─── PHP API Routes (تحويل المسارات القديمة إلى PHP) ────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # منع الوصول لمجلد migrate بعد الانتهاء من النقل
+    # قم بتفعيل هذا السطر بعد نقل البيانات:
+    # RewriteRule ^migrate/ - [F,L]
+
+    # تحويل /api/filters → /api/filters.php
+    RewriteRule ^api/filters$           api/filters.php        [L,QSA]
+    RewriteRule ^api/models$            api/models.php         [L,QSA]
+    RewriteRule ^api/analytics$         api/analytics.php      [L,QSA]
+
+    # /api/cars → /api/cars.php
+    RewriteRule ^api/cars$              api/cars.php           [L,QSA]
+
+    # /api/car/123 → /api/car_detail.php?id=123
+    RewriteRule ^api/car/([0-9]+)$      api/car_detail.php?id=$1 [L,QSA]
+
+    # /api/bookings → /api/bookings.php
+    RewriteRule ^api/bookings$          api/bookings.php       [L,QSA]
+
+    # /api/bookings/123 → /api/booking_detail.php?id=123
+    RewriteRule ^api/bookings/([0-9]+)$ api/booking_detail.php?id=$1 [L,QSA]
+</IfModule>
+
+# ─── Cache Static Assets ────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/svg+xml  "access plus 1 month"
+    ExpiresByType text/css       "access plus 1 week"
+    ExpiresByType text/javascript "access plus 1 week"
+</IfModule>
